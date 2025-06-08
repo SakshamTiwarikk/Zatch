@@ -1,0 +1,280 @@
+<%- include('./partials/header') %>
+
+<% if (typeof error !== 'undefined' && error.length > 0) { %>
+  <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-red-500 z-50 shadow-lg">
+    <% if (Array.isArray(error)) { %>
+      <% error.forEach(function(err) { %>
+        <p class="text-white mb-1"><%= err %></p>
+      <% }) %>
+    <% } else { %>
+      <p class="text-white"><%= error %></p>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (typeof success !== 'undefined' && success.length > 0) { %>
+  <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-green-500 z-50 shadow-lg">
+    <p class="text-white"><%= success %></p>
+  </div>
+<% } %>
+
+<div class="w-full min-h-screen flex">
+  <!-- Sidebar Navigation -->
+  <div class="w-1/4 bg-zinc-50 h-screen sticky top-0 px-8 py-10">
+    <div class="mb-8">
+      <h3 class="text-2xl font-semibold text-zinc-800">My Account</h3>
+      <p class="text-zinc-600">Welcome, <%= user?.fullname || 'User' %></p>
+    </div>
+    
+    <nav class="space-y-2">
+      <a href="/account/profile" 
+         class="block px-4 py-3 rounded-md transition-colors <%= currentPage === 'profile' ? 'bg-blue-500 text-white' : 'text-zinc-700 hover:bg-zinc-200' %>">
+        Profile Information
+      </a>
+      <a href="/account/security" 
+         class="block px-4 py-3 rounded-md transition-colors <%= currentPage === 'security' ? 'bg-blue-500 text-white' : 'text-zinc-700 hover:bg-zinc-200' %>">
+        Security Settings
+      </a>
+      <a href="/account/preferences" 
+         class="block px-4 py-3 rounded-md transition-colors <%= currentPage === 'preferences' ? 'bg-blue-500 text-white' : 'text-zinc-700 hover:bg-zinc-200' %>">
+        Preferences
+      </a>
+      <a href="/account/billing" 
+         class="block px-4 py-3 rounded-md transition-colors <%= currentPage === 'billing' ? 'bg-blue-500 text-white' : 'text-zinc-700 hover:bg-zinc-200' %>">
+        Billing & Plans
+      </a>
+      <a href="/users/logout" 
+         class="block px-4 py-3 rounded-md text-red-600 hover:bg-red-50 transition-colors">
+        Logout
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="w-3/4 px-20 py-10">
+    <% if (currentPage === 'profile' || !currentPage) { %>
+      <!-- Profile Section -->
+      <div class="mb-8">
+        <h4 class="text-3xl mb-2">Profile Information</h4>
+        <p class="text-zinc-600 mb-8">Update your personal information and profile details</p>
+      </div>
+
+      <form autocomplete="off" action="/account/profile" method="POST" enctype="multipart/form-data">
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-zinc-700 mb-2">Full Name</label>
+            <input
+              class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+              type="text"
+              placeholder="Full Name"
+              name="fullname"
+              value="<%= user?.fullname || '' %>"
+            />
+          </div>
+          <div>
+            <label class="block text-zinc-700 mb-2">Email Address</label>
+            <input
+              class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+              type="email"
+              placeholder="Email"
+              name="email"
+              value="<%= user?.email || '' %>"
+            />
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-zinc-700 mb-2">Phone Number</label>
+          <input
+            class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+            type="tel"
+            placeholder="Phone Number"
+            name="phone"
+            value="<%= user?.phone || '' %>"
+          />
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-zinc-700 mb-2">Bio</label>
+          <textarea
+            class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200 h-24"
+            placeholder="Tell us about yourself"
+            name="bio"
+          ><%= user?.bio || '' %></textarea>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-zinc-700 mb-2">Profile Picture</label>
+          <input
+            class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+            type="file"
+            name="profilePicture"
+            accept="image/*"
+          />
+        </div>
+
+        <input
+          class="px-8 rounded-full py-3 bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
+          type="submit"
+          value="Update Profile"
+        />
+      </form>
+
+    <% } else if (currentPage === 'security') { %>
+      <!-- Security Section -->
+      <div class="mb-8">
+        <h4 class="text-3xl mb-2">Security Settings</h4>
+        <p class="text-zinc-600 mb-8">Manage your password and security preferences</p>
+      </div>
+
+      <div class="bg-zinc-50 rounded-lg p-8 mb-8">
+        <h5 class="text-xl mb-4">Change Password</h5>
+        <form autocomplete="off" action="/account/change-password" method="post">
+          <div class="mb-4">
+            <label class="block text-zinc-700 mb-2">Current Password</label>
+            <input
+              class="bg-white block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+              type="password"
+              placeholder="Current Password"
+              name="currentPassword"
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-zinc-700 mb-2">New Password</label>
+            <input
+              class="bg-white block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+              type="password"
+              placeholder="New Password"
+              name="newPassword"
+            />
+          </div>
+          <div class="mb-6">
+            <label class="block text-zinc-700 mb-2">Confirm New Password</label>
+            <input
+              class="bg-white block w-full px-3 py-2 border-[1px] rounded-md border-zinc-200"
+              type="password"
+              placeholder="Confirm New Password"
+              name="confirmPassword"
+            />
+          </div>
+          <input
+            class="px-8 rounded-full py-3 bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
+            type="submit"
+            value="Update Password"
+          />
+        </form>
+      </div>
+
+      <div class="bg-zinc-50 rounded-lg p-8">
+        <h5 class="text-xl mb-4">Two-Factor Authentication</h5>
+        <p class="text-zinc-600 mb-4">Add an extra layer of security to your account</p>
+        <button class="px-8 rounded-full py-3 bg-green-500 text-white hover:bg-green-600 transition-colors">
+          Enable 2FA
+        </button>
+      </div>
+
+    <% } else if (currentPage === 'preferences') { %>
+      <!-- Preferences Section -->
+      <div class="mb-8">
+        <h4 class="text-3xl mb-2">Preferences</h4>
+        <p class="text-zinc-600 mb-8">Customize your account preferences and notifications</p>
+      </div>
+
+      <form autocomplete="off" action="/account/preferences" method="post">
+        <div class="bg-zinc-50 rounded-lg p-8 mb-6">
+          <h5 class="text-xl mb-4">Notification Settings</h5>
+          <div class="space-y-4">
+            <label class="flex items-center">
+              <input type="checkbox" name="emailNotifications" class="mr-3" <%= user?.preferences?.emailNotifications ? 'checked' : '' %>>
+              <span class="text-zinc-700">Email notifications</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="smsNotifications" class="mr-3" <%= user?.preferences?.smsNotifications ? 'checked' : '' %>>
+              <span class="text-zinc-700">SMS notifications</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="pushNotifications" class="mr-3" <%= user?.preferences?.pushNotifications ? 'checked' : '' %>>
+              <span class="text-zinc-700">Push notifications</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-zinc-50 rounded-lg p-8 mb-6">
+          <h5 class="text-xl mb-4">Privacy Settings</h5>
+          <div class="space-y-4">
+            <label class="flex items-center">
+              <input type="checkbox" name="profilePublic" class="mr-3" <%= user?.preferences?.profilePublic ? 'checked' : '' %>>
+              <span class="text-zinc-700">Make profile public</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="showOnlineStatus" class="mr-3" <%= user?.preferences?.showOnlineStatus ? 'checked' : '' %>>
+              <span class="text-zinc-700">Show online status</span>
+            </label>
+          </div>
+        </div>
+
+        <input
+          class="px-8 rounded-full py-3 bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer"
+          type="submit"
+          value="Save Preferences"
+        />
+      </form>
+
+    <% } else if (currentPage === 'billing') { %>
+      <!-- Billing Section -->
+      <div class="mb-8">
+        <h4 class="text-3xl mb-2">Billing & Plans</h4>
+        <p class="text-zinc-600 mb-8">Manage your subscription and payment methods</p>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h5 class="text-xl text-blue-800 mb-2">Current Plan</h5>
+        <p class="text-blue-700">
+          <span class="font-semibold">Pro Plan</span> - $29/month
+        </p>
+        <p class="text-blue-600 text-sm mt-1">Next billing date: <%= new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString() %></p>
+      </div>
+
+      <div class="bg-zinc-50 rounded-lg p-8 mb-8">
+        <h5 class="text-xl mb-4">Payment Methods</h5>
+        <div class="border border-zinc-200 rounded-md p-4 bg-white">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-12 h-8 bg-blue-600 rounded text-white text-xs flex items-center justify-center mr-3">
+                VISA
+              </div>
+              <div>
+                <p class="font-medium">**** **** **** 4242</p>
+                <p class="text-sm text-zinc-500">Expires 12/25</p>
+              </div>
+            </div>
+            <button class="text-blue-500 hover:text-blue-700 text-sm">Edit</button>
+          </div>
+        </div>
+        <button class="mt-4 px-6 rounded-full py-2 border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors">
+          Add Payment Method
+        </button>
+      </div>
+
+      <div class="bg-zinc-50 rounded-lg p-8">
+        <h5 class="text-xl mb-4">Billing History</h5>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center py-2 border-b border-zinc-200">
+            <span class="text-zinc-700">Pro Plan - December 2024</span>
+            <span class="font-medium">$29.00</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-zinc-200">
+            <span class="text-zinc-700">Pro Plan - November 2024</span>
+            <span class="font-medium">$29.00</span>
+          </div>
+          <div class="flex justify-between items-center py-2">
+            <span class="text-zinc-700">Pro Plan - October 2024</span>
+            <span class="font-medium">$29.00</span>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('./partials/footer') %>

@@ -1,0 +1,79 @@
+<%- include('./partials/header') %>
+
+<% if (typeof success !== 'undefined' && success.length > 0) { %>
+  <div class="fixed top-5 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md bg-green-500 text-white z-50 shadow-lg">
+    <%= success[0] %>
+  </div>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error.length > 0) { %>
+  <div class="fixed top-16 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md bg-red-500 text-white z-50 shadow-lg">
+    <%= error[0] %>
+  </div>
+<% } %>
+
+<div class="w-full h-screen flex items-start px-20 py-20">
+  <div class="w-[25%] flex h-screen flex-col items-start">
+    <div class="flex items-center gap-2">
+      <h3>sort by</h3>
+      <form action="/shop">
+        <select class="border-[1px] px-2 py-1" name="sortby">
+          <option value="popular">Popular</option>
+          <option value="newest">Newest</option>
+        </select>
+      </form>
+    </div>
+    <div class="flex flex-col mt-20">
+      <a class="block w-fit mb-2" href="">New Collection</a>
+      <a class="block w-fit mb-2" href="">All Products</a>
+      <a class="block w-fit mb-2" href="">Discounted Products</a>
+    </div>
+    <div class="mt-32">
+      <a class="block w-fit mb-2" href="">Filter by :</a>
+      <a class="block w-fit mb-2" href="">Availability</a>
+      <a class="block w-fit mb-2" href="">Discount</a>
+    </div>
+  </div>
+
+  <div class="w-[75%] flex flex-col gap-5 h-screen overflow-y-auto">
+    <div class="flex items-start gap-5 flex-wrap">
+      <% if (typeof products !== 'undefined' && products.length > 0) { %>
+        <% products.forEach(function(product) { %>
+          <div class="w-60">
+            <div class="w-full h-52 flex items-center justify-center bg-[<%= product.bgcolor || '#f0f0f0' %>]">
+              <% if (product.image) { %>
+                <img
+                  class="h-[12rem]"
+                  src="data:image/jpeg;base64,<%= product.image.toString('base64') %>"
+                  alt="<%= product.name || 'Product' %>"
+                />
+              <% } else { %>
+                <div class="text-gray-500">No Image</div>
+              <% } %>
+            </div>
+            <div
+              class="flex justify-between bg-[<%= product.panelcolor || '#ffffff' %>] items-center px-4 py-4 text-[<%= product.textcolor || '#000000' %>]"
+            >
+              <div>
+                <h3><%= product.name || 'Unknown Product' %></h3>
+                <h4>₹ <%= product.price || '0' %></h4>
+              </div>
+              <a
+                class="w-7 h-7 flex items-center justify-center rounded-full bg-white"
+                href="/addtocart/<%= product._id %>"
+              >
+                <i class="ri-add-line"></i>
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="w-full text-center py-10">
+          <p class="text-gray-500">No products available at the moment.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('./partials/footer') %>
