@@ -1,75 +1,354 @@
-<%- include('./partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zatch - Authentication</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+      @import url("https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css");
 
-<% if (typeof error !== 'undefined' && error.length > 0) { %>
-  <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-red-500 z-50 shadow-lg">
-    <% if (Array.isArray(error)) { %>
-      <% error.forEach(function(err) { %>
-        <p class="text-white mb-1"><%= err %></p>
-      <% }) %>
-    <% } else { %>
-      <p class="text-white"><%= error %></p>
-    <% } %>
-  </div>
-<% } %>
+      /* Custom transitions for smooth tab switching */
+      .tab-content {
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      }
 
-<div class="w-full h-screen flex px-20">
-  <div class="w-1/2 flex items-center justify-center h-screen">
-    <div class="w-full px-32">
-      <h3 class="text-4xl">
-        welcome to <span class="text-blue-400 font-semibold">Zatch</span>
-      </h3>
-      <h4 class="text-2xl mb-5">create your account</h4>
-      <form autocomplete="off" action="/users/register" method="post">
-        <input
-          class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md mb-3 border-zinc-200"
-          type="text"
-          placeholder="Full Name"
-          name="fullname"
-        />
-        <input
-          class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md mb-3 border-zinc-200"
-          type="email"
-          placeholder="Email"
-          name="email"
-        />
-        <input
-          class="bg-zinc-100 block w-full px-3 py-2 border-[1px] rounded-md mb-3 border-zinc-200"
-          type="password"
-          placeholder="Password"
-          name="password"
-        />
-        <input
-          class="px-5 rounded-full py-3 mt-2 bg-blue-500 text-white"
-          type="submit"
-          value="Create My Account"
-        />
-      </form>
+      .tab-content.hidden {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+
+      .tab-content.active {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      /* Glassmorphism effect for modern look */
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      /* Gradient background */
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      /* Button hover effects */
+      .btn-primary {
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+      }
+
+      /* Input focus effects */
+      .form-input {
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Mobile-first responsive design */
+      @media (max-width: 768px) {
+        .mobile-stack {
+          flex-direction: column;
+        }
+
+        .mobile-full-height {
+          min-height: 50vh;
+        }
+
+        .mobile-padding {
+          padding: 1rem;
+        }
+      }
+
+      /* Tab indicator */
+      .tab-indicator {
+        transition: transform 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="font-sans">
+    <!-- Error Messages -->
+    <div
+      id="errorContainer"
+      class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 hidden"
+    >
+      <div class="bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <p id="errorMessage"></p>
+      </div>
     </div>
-  </div>
-  <div class="w-1/2 flex items-center justify-center h-screen">
-    <div class="w-full px-32">
-      <h4 class="text-2xl capitalize mb-5">login your account</h4>
-      <form autocomplete="off" action="/users/login" method="post">
-        <input
-          class="block bg-zinc-100 w-full px-3 py-2 border-[1px] rounded-md mb-3 border-zinc-200"
-          type="email"
-          placeholder="Email"
-          name="email"
-        />
-        <input
-          class="block bg-zinc-100 w-full px-3 py-2 border-[1px] rounded-md mb-3 border-zinc-200"
-          type="password"
-          placeholder="Password"
-          name="password"
-        />
-        <input
-          class="px-5 block rounded-full py-3 mt-2 bg-blue-500 text-white"
-          type="submit"
-          value="Login"
-        />
-      </form>
-    </div>
-  </div>
-</div>
 
-<%- include('./partials/footer') %>
+    <!-- Main Container -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+      <div class="w-full max-w-6xl">
+        <!-- Desktop Layout (md and up) -->
+        <div
+          class="hidden md:flex bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[600px]"
+        >
+          <!-- Registration Side -->
+          <div
+            class="w-1/2 flex items-center justify-center p-12 bg-gradient-to-br from-blue-50 to-indigo-100"
+          >
+            <div class="w-full max-w-md">
+              <div class="text-center mb-8">
+                <h3 class="text-4xl font-light mb-2">
+                  welcome to
+                  <span class="text-blue-500 font-semibold">Zatch</span>
+                </h3>
+                <h4 class="text-2xl text-gray-600">create your account</h4>
+              </div>
+
+              <form
+                autocomplete="off"
+                action="/users/register"
+                method="post"
+                class="space-y-4"
+              >
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  type="text"
+                  placeholder="Full Name"
+                  name="fullname"
+                  required
+                />
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  required
+                />
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  required
+                />
+                <button
+                  class="btn-primary w-full py-3 mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg"
+                  type="submit"
+                >
+                  Create My Account
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Login Side -->
+          <div class="w-1/2 flex items-center justify-center p-12">
+            <div class="w-full max-w-md">
+              <div class="text-center mb-8">
+                <h4 class="text-2xl text-gray-700 capitalize">
+                  login your account
+                </h4>
+              </div>
+
+              <form
+                autocomplete="off"
+                action="/users/login"
+                method="post"
+                class="space-y-4"
+              >
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  required
+                />
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  required
+                />
+                <button
+                  class="btn-primary w-full py-3 mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg"
+                  type="submit"
+                >
+                  Login
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Layout (sm and below) -->
+        <div class="md:hidden bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <!-- Tab Headers -->
+          <div class="relative flex bg-gray-100">
+            <button
+              id="registerTab"
+              class="flex-1 py-4 px-6 text-center font-semibold transition-colors duration-300 tab-button active"
+              onclick="switchTab('register')"
+            >
+              Register
+            </button>
+            <button
+              id="loginTab"
+              class="flex-1 py-4 px-6 text-center font-semibold transition-colors duration-300 tab-button"
+              onclick="switchTab('login')"
+            >
+              Login
+            </button>
+
+            <!-- Tab Indicator -->
+            <div
+              class="absolute bottom-0 left-0 h-1 bg-blue-500 tab-indicator"
+              style="width: 50%; transform: translateX(0%)"
+            ></div>
+          </div>
+
+          <!-- Tab Content -->
+          <div class="p-6">
+            <!-- Register Form -->
+            <div id="registerContent" class="tab-content active">
+              <div class="text-center mb-6">
+                <h3 class="text-3xl font-light mb-2">
+                  welcome to
+                  <span class="text-blue-500 font-semibold">Zatch</span>
+                </h3>
+                <p class="text-gray-600">create your account</p>
+              </div>
+
+              <form
+                autocomplete="off"
+                action="/users/register"
+                method="post"
+                class="space-y-4"
+              >
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="text"
+                  placeholder="Full Name"
+                  name="fullname"
+                  required
+                />
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  required
+                />
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  required
+                />
+                <button
+                  class="btn-primary w-full py-3 mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg"
+                  type="submit"
+                >
+                  Create My Account
+                </button>
+              </form>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginContent" class="tab-content hidden">
+              <div class="text-center mb-6">
+                <h4 class="text-2xl text-gray-700 capitalize">
+                  login your account
+                </h4>
+              </div>
+
+              <form
+                autocomplete="off"
+                action="/users/login"
+                method="post"
+                class="space-y-4"
+              >
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  required
+                />
+                <input
+                  class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  required
+                />
+                <button
+                  class="btn-primary w-full py-3 mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg"
+                  type="submit"
+                >
+                  Login
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function switchTab(tab) {
+        const registerTab = document.getElementById("registerTab");
+        const loginTab = document.getElementById("loginTab");
+        const registerContent = document.getElementById("registerContent");
+        const loginContent = document.getElementById("loginContent");
+        const indicator = document.querySelector(".tab-indicator");
+
+        // Remove active classes
+        registerTab.classList.remove("active", "text-blue-500", "bg-white");
+        loginTab.classList.remove("active", "text-blue-500", "bg-white");
+        registerContent.classList.add("hidden");
+        loginContent.classList.add("hidden");
+        registerContent.classList.remove("active");
+        loginContent.classList.remove("active");
+
+        if (tab === "register") {
+          registerTab.classList.add("active", "text-blue-500", "bg-white");
+          registerContent.classList.remove("hidden");
+          registerContent.classList.add("active");
+          indicator.style.transform = "translateX(0%)";
+        } else {
+          loginTab.classList.add("active", "text-blue-500", "bg-white");
+          loginContent.classList.remove("hidden");
+          loginContent.classList.add("active");
+          indicator.style.transform = "translateX(100%)";
+        }
+      }
+
+      // Initialize the first tab as active
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("registerTab")
+          .classList.add("text-blue-500", "bg-white");
+      });
+
+      // Error handling function (if you want to show errors dynamically)
+      function showError(message) {
+        const errorContainer = document.getElementById("errorContainer");
+        const errorMessage = document.getElementById("errorMessage");
+
+        errorMessage.textContent = message;
+        errorContainer.classList.remove("hidden");
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+          errorContainer.classList.add("hidden");
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>
