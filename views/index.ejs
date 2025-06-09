@@ -78,15 +78,23 @@
     </style>
   </head>
   <body class="font-sans">
-    <!-- Error Messages -->
+    <!-- Success Message -->
+    <% if (success && success.length > 0) { %>
     <div
-      id="errorContainer"
-      class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 hidden"
+      class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 p-3 rounded-lg bg-blue-500 text-white shadow-lg"
     >
-      <div class="bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
-        <p id="errorMessage"></p>
-      </div>
+      <%= success %>
     </div>
+    <% } %>
+
+    <!-- Error Message -->
+    <% if (error && error.length > 0) { %>
+    <div
+      class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 p-3 rounded-lg bg-red-500 text-white shadow-lg"
+    >
+      <%= error %>
+    </div>
+    <% } %>
 
     <!-- Main Container -->
     <div class="min-h-screen flex items-center justify-center p-4">
@@ -335,20 +343,6 @@
           .getElementById("registerTab")
           .classList.add("text-blue-500", "bg-white");
       });
-
-      // Error handling function (if you want to show errors dynamically)
-      function showError(message) {
-        const errorContainer = document.getElementById("errorContainer");
-        const errorMessage = document.getElementById("errorMessage");
-
-        errorMessage.textContent = message;
-        errorContainer.classList.remove("hidden");
-
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-          errorContainer.classList.add("hidden");
-        }, 5000);
-      }
     </script>
   </body>
 </html>

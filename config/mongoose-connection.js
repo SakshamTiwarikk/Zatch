@@ -5,7 +5,7 @@ const config = require("config");
 const dbgr = require('debug')("development:mongoose");
 
 mongoose
-  .connect(`${config.get("MONGODB_URL")}/zatch`)
+  .connect(`${config.get("MONGODB_URL")}`)
   .then(function () {
     dbgr("connected");
   })
